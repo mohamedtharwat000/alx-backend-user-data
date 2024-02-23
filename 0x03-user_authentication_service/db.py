@@ -16,10 +16,10 @@ class DB:
     def __init__(self) -> None:
         """Initialize a new DB instance
         """
-        self.__session = None
         self._engine = create_engine("sqlite:///a.db", echo=True)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
+        self.__session = None
 
     @property
     def _session(self) -> Session:
