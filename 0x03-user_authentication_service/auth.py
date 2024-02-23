@@ -2,9 +2,10 @@
 
 """Auth module"""
 
+from sqlalchemy.orm.exc import NoResultFound
 import bcrypt
-from user import User
 from db import DB
+from user import User
 
 
 def _hash_password(password: str) -> bytes:
@@ -22,10 +23,9 @@ class Auth:
     def register_user(self, email: str, password: str) -> User:
         """Register a user
         """
-        user = self._db.find_user_by(email=email)
-        if user is not None:
-            raise ValueError(f"User {email} already exists")
+        try:
+            self._db.find_user_by(email=email)
+        except NoResultFound:
+            return self._db.add_user(email, _hash_password(password))
 
-        hashed_password = _hash_password(password)
-        user = self._db.add_user(email, hashed_password)
-        return user
+        raise ValueError(f'User {email} already exists')
